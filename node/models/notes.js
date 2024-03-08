@@ -1,20 +1,26 @@
 const mongoose = require('mongoose')
 
-const password = process.argv[2]
+mongoose.set('strictQuery', false)
 
-// DO NOT SAVE YOUR PASSWORD TO GITHUB!!
-const url =
-  `mongodb+srv://fullstack:${password}@cluster0.sfzpf2a.mongodb.net/?retryWrites=true&w=majority`
 
-mongoose.set('strictQuery',false)
+const url = process.env.MONGODB_URI
+
+
+console.log('connecting to', url)
+
 mongoose.connect(url)
+
+  .then(result => {
+    console.log('connected to MongoDB')
+  })
+  .catch(error => {
+    console.log('error connecting to MongoDB:', error.message)
+  })
 
 const noteSchema = new mongoose.Schema({
   content: String,
   important: Boolean,
 })
-
-const Note = mongoose.model('Note', noteSchema)
 
 noteSchema.set('toJSON', {
   transform: (document, returnedObject) => {
@@ -23,3 +29,6 @@ noteSchema.set('toJSON', {
     delete returnedObject.__v
   }
 })
+
+
+module.exports = mongoose.model('Note', noteSchema)
